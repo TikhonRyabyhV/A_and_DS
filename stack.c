@@ -22,15 +22,14 @@ void destroy_stack (char_stack_st* src) {
 	free(src->first_member);
 
 	src->cur_member = -1;
-	src->member_len = mem_len;
-	src->member_cnt = mem_cnt;
+	src->member_cnt = 0;
 
 	return;
 }
 
 void grow_stack (char_stack_st* src) {
 	
-	src->first_member = realloc(src->first_member, src->member_len * src->member_cnt * 2 * sizeof(char))
+	src->first_member = realloc(src->first_member, src->member_len * src->member_cnt * 2 * sizeof(char));
 
 	if(src->first_member == NULL)
 		return;
