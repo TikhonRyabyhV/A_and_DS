@@ -42,7 +42,7 @@ void grow_stack (char_stack_st* src) {
 
 void put_item (char_stack_st* src, char* item, int size) {
 	
-	if(((double) src->cur_member) / ((double) src->member_cnt) >= 0.8)
+	if(((double) src->cur_member + 1) / ((double) src->member_cnt) >= 0.8)
 		grow_stack(src);
 
 	src->cur_member++;
