@@ -1,38 +1,72 @@
 #include "stack.h"
+#include "breakers.h"
 
-void create_stack (char_stack_st* src, int mem_len, int mem_cnt) {
+void create_stack (char_stack_st* src, int init_size, int member_cnt) {
 
-		src->first_member = calloc(mem_cnt * mem_len, sizeof(char));
+		void_func_breaker(init_size  > 0)
+		void_func_breaker(member_cnt > 0)
 
-		if(src->first_member == NULL)
-			return;
+		src->char_array = calloc(init_size, sizeof(char));
+		void_func_breaker(src->char_array != NULL)
 
-		src->cur_member = -1;
-		src->member_len = mem_len;
-		src->member_cnt = mem_cnt;
+		src->size_array = calloc(member_cnt, sizeof(int));
+		void_func_breaker(src->size_array != NULL)
+
+		src->cur_member = -1        ;
+		src->member_cnt = member_cnt;
+		src->used_char  = 0         ;
+		src->free_char  = init_size ;
 
 		return;
 }
 
 void destroy_stack (char_stack_st* src) {
 	
-	if(src->first_member == NULL)
+	void_func_breaker(src != NULL)
+	
+	if(src->char_array == NULL)
 		return;
-
-	free(src->first_member);
+	free(src->char_array);
+	
+	if(src->size_array == NULL)
+		return;
+	free(src->size_array);
 
 	src->cur_member = -1;
-	src->member_cnt = 0;
+	src->member_cnt = 0 ;
+	src->used_char  = 0 ;
+	src->free_char  = 0 ;
 
 	return;
 }
 
-void grow_stack (char_stack_st* src) {
-	
-	src->first_member = realloc(src->first_member, src->member_len * src->member_cnt * 2 * sizeof(char));
+void grow_stack (char_stack_st* src, int incr) {
 
-	if(src->first_member == NULL)
-		return;
+	void_func_breaker(src             != NULL)
+	void_func_breaker(src->char_array != NULL)
+
+	void_func_breaker(incr > 0)
+
+	
+	src->char_array = realloc(src->char_array, (src->used_char + src->free_char + incr) * sizeof(char));
+
+	void_func_breaker(src->char_array != NULL)
+
+	src->free_char = (src->used_char + src->free_char + incr) - src->used_char;
+
+	return;
+
+}
+
+
+void grow_member_cnt (char_stack_st* src) {
+	
+	void_func_breaker(src             != NULL)
+	void_func_breaker(src->size_array != NULL)
+
+	src->size_array = realloc(src->size_array, src->member_cnt * 2 * sizeof(int));
+
+	void_func_breaker(src->size_array != NULL)
 
 	src->member_cnt *= 2;
 
@@ -40,29 +74,58 @@ void grow_stack (char_stack_st* src) {
 
 }
 
+
 void put_item (char_stack_st* src, char* item, int size) {
 	
+	void_func_breaker(src  != NULL)
+	void_func_breaker(item != NULL)
+	
+	void_func_breaker(src->char_array != NULL)
+	void_func_breaker(src->size_array != NULL)
+
+	void_func_breaker(size > 0)
+
 	if(((double) src->cur_member + 1) / ((double) src->member_cnt) >= 0.8)
-		grow_stack(src);
+		grow_member_cnt(src);
+	
+	if(((double) src->used_char) / ((double) src->used_char + src->free_char) >= 0.8)
+		grow_stack(src, src->used_char + src->free_char);
+	
+	if(size > src->free_char)
+		grow_stack(src, src->used_char + size);
 
-	src->cur_member++;
+	char* start_ptr = &(src->char_array[src->used_char]);
 
-	char* start_ptr = &(src->first_member[src->cur_member * src->member_len]);
-
-	for(int i = 0; i < src->member_len; i++)
+	for(int i = 0; i < size; i++)
 		start_ptr[i] = item[i];
+	
+	src->cur_member++;
+	src->size_array[src->cur_member] = size;
+
+	src->used_char += size;
+	src->free_char -= size;
 
 	return;
 }
 
 void get_item (char_stack_st* src, char* buffer) {
 	
-	char* start_ptr = &(src->first_member[src->cur_member * src->member_len]);
+	void_func_breaker(src    != NULL)
+	void_func_breaker(buffer != NULL)
+	
+	void_func_breaker(src->char_array != NULL)
+	void_func_breaker(src->size_array != NULL)
 
-	for(int i = 0; i < src->member_len; i++)
+	int   item_size = src->size_array[src->cur_member];
+	char* start_ptr = &(src->char_array[src->used_char - item_size]);
+
+	for(int i = 0; i < item_size; i++)
 		buffer[i] = start_ptr[i];
 
 	src->cur_member--;
+
+	src->used_char -= item_size;
+	src->free_char += item_size;
 
 	return;
 
