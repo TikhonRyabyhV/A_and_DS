@@ -93,10 +93,12 @@ int main() {
 		switch(dir_size) {
 			case 1:
 				flag =     comp_str(dir_ptr, sp_str[0], 1);
+				break;
 			case 2:
 				flag = 2 * comp_str(dir_ptr, sp_str[1], 2);
+				break;
 			default:
-				;
+				break;
 		}
 
 
