@@ -6,10 +6,25 @@
 
 #define PATH_MAX 4096
 
+int comp_str (char* a, char* b, int size) {
+	
+	func_breaker(size > 0)
+
+	func_breaker(a != NULL)
+	func_breaker(b != NULL)
+
+	for(int i = 0; i < size; ++i)
+		if(a[i] != b[i])
+			return 0;
+
+	return 1;
+
+}
+
 int skip_slashes (char* src, int start) {
 	
-	void_func_breaker(src != NULL)
-	void_func_breaker(start >= 0 )
+	func_breaker(src != NULL)
+	func_breaker(start >= 0 )
 
 	int i = start;
 
@@ -20,16 +35,16 @@ int skip_slashes (char* src, int start) {
 
 }
 
-int get_dir(char* src, int start, int dir_size) {
+int get_dir(char* src, int start) {
 
-	void_func_breaker(src != NULL)
-	void_func_breaker(start >= 0 )
+	func_breaker(src      != NULL)
+
+	func_breaker(start >= 0 )
 
 	int i = start;
-	size = 0;
 
-	while(src[i] != '/' || src[i] != '\0')
-		++size;
+	while(src[i] != '/' && src[i] != '\0') 
+		++i;
 
 	return i;
 
@@ -42,13 +57,17 @@ int main() {
 
 	char* input_string;
 	input_string = calloc(PATH_MAX, sizeof(char));
-	void_func_breaker(input_string != NULL)
+	func_breaker(input_string != NULL)
 	
 	char* buffer;
 	buffer = calloc(PATH_MAX, sizeof(char));
-	void_func_breaker(buffer != NULL)
+	func_breaker(buffer != NULL)
 
-	void_func_breaker(input_string == gets(input_string))
+	//func_breaker(input_string == gets(input_string))
+	gets(input_string);
+
+
+	char* sp_str[2] = {".", ".."};
 
 	int cur_char      = 0;
 	int dir_size      = 0;
@@ -63,9 +82,13 @@ int main() {
 		cur_char = skip_slashes(input_string, cur_char);
 
 		dir_ptr = &(input_string[cur_char]);
-		void_func_breaker(input_string[cur_char] != '\0')
+		func_breaker(input_string[cur_char] != '\0')
 
-		cur_char = get_dir(input_string, cur_char, dir_size);
+		dir_size = cur_char;
+
+		cur_char = get_dir(input_string, cur_char);
+
+		dir_size = cur_char - dir_size;
 
 		switch(dir_size) {
 			case 1:
@@ -79,7 +102,7 @@ int main() {
 
 		if(flag == 2) {
 			if(path_size == 0) {
-				printf();
+				printf("Cannot do this!\n");
 
 				destroy_stack(&stack);
 
@@ -89,23 +112,53 @@ int main() {
 				return 0;
 			}	
 
-			get_item(&stack, buffer);
+			prev_dir_size = get_item(&stack, buffer);
 
 			path_size -= (prev_dir_size + 1);
 		}
 
 		else {
-			put_item(&stack, dir_ptr, dir_size);
+
+			if(flag == 1);
+
+			else {
+				put_item(&stack, dir_ptr, dir_size);
 			
-			path_size += (dir_size + 1); 
+				path_size += (dir_size + 1); 
+			}
 		}
 
-		prev_dir_size = dir_size;
 		dir_ptr  = NULL;
 		dir_size = 0   ;
+		flag     = 0   ;
+	
+	
 	}
 
-	for
+	int item_size = 0;
+	
+	input_string[path_size] = '\0';
+
+	while(path_size > 0) {
+
+		item_size = get_item(&stack, buffer);
+
+		for(int i = path_size - item_size, j = 0; i < path_size, j < item_size; ++i, ++j)
+			input_string[i] = buffer[j];
+
+		input_string[path_size - item_size - 1] = '/';
+
+		path_size -= (item_size + 1);
+
+	}
+
+	printf("Canon form of the path: \n");
+	printf("%s\n", input_string);
+
+	destroy_stack(&stack);
+
+	free(input_string);
+	free(buffer      );
 
 	return 0;
 

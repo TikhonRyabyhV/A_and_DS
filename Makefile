@@ -1,4 +1,4 @@
-OBJECTS=	main.o stack.o
+OBJECTS=	canon_form.o stack.o
 
 .cpp.o:
 	@ gcc -c -o $@ $<

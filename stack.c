@@ -108,13 +108,13 @@ void put_item (char_stack_st* src, char* item, int size) {
 	return;
 }
 
-void get_item (char_stack_st* src, char* buffer) {
+int get_item (char_stack_st* src, char* buffer) {
 	
-	void_func_breaker(src    != NULL)
-	void_func_breaker(buffer != NULL)
+	func_breaker(src    != NULL)
+	func_breaker(buffer != NULL)
 	
-	void_func_breaker(src->char_array != NULL)
-	void_func_breaker(src->size_array != NULL)
+	func_breaker(src->char_array != NULL)
+	func_breaker(src->size_array != NULL)
 
 	int   item_size = src->size_array[src->cur_member];
 	char* start_ptr = &(src->char_array[src->used_char - item_size]);
@@ -127,7 +127,7 @@ void get_item (char_stack_st* src, char* buffer) {
 	src->used_char -= item_size;
 	src->free_char += item_size;
 
-	return;
+	return item_size;
 
 }
 

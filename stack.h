@@ -23,4 +23,5 @@ void grow_member_cnt (char_stack_st* src);
 
 void  put_item (char_stack_st* src, char* item, int size);
 
-void  get_item (char_stack_st* src, char* buffer);
+int  get_item (char_stack_st* src, char* buffer);
+
