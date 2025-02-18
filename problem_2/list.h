@@ -20,6 +20,7 @@ typedef struct list_head {
 
 } list_head_st;	
 
+void init_list (list_head_st* src);
 
 list_member_st* goto_member (list_head_st* src, int place);
 

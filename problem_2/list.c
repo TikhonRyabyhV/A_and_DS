@@ -1,5 +1,19 @@
+#include <stdlib.h>
 #include "list.h"
 #include "breakers.h"
+
+void init_list (list_head_st* src) {
+	
+	void_func_breaker(src != NULL)
+
+	src->list_size = 0;
+
+	src->first_member = NULL;
+	src->last_member  = NULL; 
+
+	return;
+
+}
 
 list_member_st* goto_member (list_head_st* src, int place) {
 	
@@ -61,8 +75,8 @@ void insert_member (list_head_st* src, int range, char* str, int size) {
 		}
 
 		else {
-			prev_member = goto_member(src, place - 1);
-			next_member = goto_member(src, place + 1);
+			prev_member = goto_member(src, range - 1);
+			next_member = goto_member(src, range + 1);
 
 			void_func_breaker(prev_member != NULL)
 			void_func_breaker(next_member != NULL)
@@ -94,12 +108,19 @@ void delete_member (list_head_st* src, int place) {
 	list_member_st *prev_member = NULL, *next_member = NULL;
 
 	if(place == 1) {
+		if(src->list_size == 1)	{
+			src->first_member = NULL;
+			src->last_member  = NULL; 
+		}
+
+		else {
 			next_member = tmp->next_member ;
 			next_member->prev_member = NULL;
 			src->first_member = next_member;
+		}
 	}
 
-	else if(range == src->list_size) {
+	else if(place == src->list_size) {
 		prev_member = tmp->prev_member ;
 		prev_member->next_member = NULL;
 		src->last_member = prev_member ;
