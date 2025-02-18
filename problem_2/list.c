@@ -17,7 +17,7 @@ void init_list (list_head_st* src) {
 
 list_member_st* goto_member (list_head_st* src, int place) {
 	
-	if(src != NULL)
+	if(src == NULL)
 		return NULL;
 
 	if(src->list_size < place || place <= 0)
@@ -63,28 +63,35 @@ void insert_member (list_head_st* src, int range, char* str, int size) {
 
 	if(src->list_size > 0) {
 		if(range == 1) {
-			next_member = src->first_member       ;
-			(src->first_member)->prev_member = tmp;
-			src->first_member = tmp;
-		}
-
-		else if(range == (src->list_size + 1)) {
-			prev_member = src->first_member      ;
-			(src->last_member)->next_member = tmp;
-			src->last_member = tmp;
+			next_member = src->first_member;
+			next_member->prev_member = tmp ;
+			src->first_member = tmp        ;
 		}
 
 		else {
-			prev_member = goto_member(src, range - 1);
-			next_member = goto_member(src, range + 1);
+			if(range == (src->list_size + 1)) {
+				prev_member = src->last_member;
+				prev_member->next_member = tmp;
+				src->last_member = tmp        ;
+			}
 
-			void_func_breaker(prev_member != NULL)
-			void_func_breaker(next_member != NULL)
+			else {
+				prev_member = goto_member(src, range - 1);
+				next_member = goto_member(src, range    );
 
-			prev_member->next_member = tmp;
-			next_member->prev_member = tmp;
+				void_func_breaker(prev_member != NULL)
+				void_func_breaker(next_member != NULL)
+
+				prev_member->next_member = tmp;
+				next_member->prev_member = tmp;
+			}
 		}
 
+	}
+
+	else {
+		src->first_member = tmp;
+		src->last_member  = tmp;
 	}
 
 	tmp->prev_member = prev_member;
@@ -120,21 +127,23 @@ void delete_member (list_head_st* src, int place) {
 		}
 	}
 
-	else if(place == src->list_size) {
-		prev_member = tmp->prev_member ;
-		prev_member->next_member = NULL;
-		src->last_member = prev_member ;
-	}
-
 	else {
-		prev_member = tmp->prev_member;
-		next_member = tmp->next_member;
+		if(place == src->list_size) {
+			prev_member = tmp->prev_member ;
+			prev_member->next_member = NULL;
+			src->last_member = prev_member ;
+		}
 
-		void_func_breaker(prev_member != NULL)
-		void_func_breaker(next_member != NULL)
+		else {
+			prev_member = tmp->prev_member;
+			next_member = tmp->next_member;
 
-		prev_member->next_member = next_member;
-		next_member->prev_member = prev_member;
+			void_func_breaker(prev_member != NULL)
+			void_func_breaker(next_member != NULL)
+
+			prev_member->next_member = next_member;
+			next_member->prev_member = prev_member;
+		}
 	}
 
 
