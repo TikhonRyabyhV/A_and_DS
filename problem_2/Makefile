@@ -1,4 +1,4 @@
-OBJECTS=	main.o list.o
+OBJECTS=	browser.o list.o
 
 .c.o:
 	@ gcc -c -o $@ $<
