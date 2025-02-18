@@ -2,8 +2,8 @@ OBJECTS=	browser.o browser_funcs.o list.o
 
 .c.o:
 	@ gcc -c -o $@ $<
-out: $(OBJECTS)
-	@ gcc -g -fsanitize=address -o out $(OBJECTS)
+build: $(OBJECTS)
+	@ gcc -g -fsanitize=address -fsanitize=undefined -o out $(OBJECTS)
 	@ rm -f *.o
 	@ echo "Success"
 .SUFFIXES: .c.o

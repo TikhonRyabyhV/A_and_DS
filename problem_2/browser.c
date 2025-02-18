@@ -72,7 +72,7 @@ int main() {
 				break;
 
 			case BACK   :
-				if(cur_com.arg_num > (browser_list.list_size - shift))
+				if(cur_com.arg_num >= (browser_list.list_size - shift))
 					shift = browser_list.list_size - 1;
 				
 				else
