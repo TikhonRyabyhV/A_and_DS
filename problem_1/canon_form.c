@@ -63,8 +63,7 @@ int main() {
 	buffer = calloc(PATH_MAX, sizeof(char));
 	func_breaker(buffer != NULL)
 
-	//func_breaker(input_string == gets(input_string))
-	gets(input_string);
+	func_breaker(input_string == fgets(input_string, PATH_MAX, stdin))
 
 
 	char* sp_str[2] = {".", ".."};
@@ -104,7 +103,7 @@ int main() {
 
 		if(flag == 2) {
 			if(path_size == 0) {
-				printf("Cannot do this!\n");
+				printf("Going upper than the root directory is not possible.\n");
 
 				destroy_stack(&stack);
 
