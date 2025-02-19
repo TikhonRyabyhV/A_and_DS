@@ -55,19 +55,55 @@ int main() {
 	char_stack_st stack;
 	create_stack(&stack, 1, 1);
 
-	char* input_string;
+#ifdef TEST
+	char* input_data[4] = {
+		"/home////////////////////////Downloads///////",
+		"/home/./Downloads/Films/../Stories/"          ,
+		"/home/base/../../../"                         ,
+		"/home/Downloads/../Files/./GitHub////../"
+	};
+	char* expectation[4] = {
+		"/home/Downloads"                                     ,
+		"/home/Downloads/Stories"                             ,
+		"Going upper than the root directory is not possible.",
+		"/home/Files"
+
+	};
+
+	int test_num = 0, success = 0, result = 0;
+#endif
+
+	char* input_string = NULL;
+#ifndef TEST
 	input_string = calloc(PATH_MAX, sizeof(char));
 	func_breaker(input_string != NULL)
+#endif
 	
+	char* output_string = NULL;
+	output_string = calloc(PATH_MAX, sizeof(char));
+	func_breaker(output_string != NULL)
+
+
 	char* buffer;
 	buffer = calloc(PATH_MAX, sizeof(char));
 	func_breaker(buffer != NULL)
 
-	func_breaker(input_string == fgets(input_string, PATH_MAX, stdin))
-
-
 	char* sp_str[2] = {".", ".."};
 
+#ifndef TEST
+	func_breaker(input_string == fgets(input_string, PATH_MAX, stdin))
+	
+	int k = 0;
+	while(input_string[k] != '\n')
+		++k;
+	input_string[k] = '\0';
+#else
+test_label:
+	input_string = input_data[test_num];
+
+	result = 0;
+#endif
+	
 	int cur_char      = 0;
 	int dir_size      = 0;
 	int path_size     = 0;
@@ -81,7 +117,8 @@ int main() {
 		cur_char = skip_slashes(input_string, cur_char);
 
 		dir_ptr = &(input_string[cur_char]);
-		func_breaker(input_string[cur_char] != '\0')
+		if(input_string[cur_char] == '\0')
+			break;
 
 		dir_size = cur_char;
 
@@ -103,14 +140,28 @@ int main() {
 
 		if(flag == 2) {
 			if(path_size == 0) {
-				printf("Going upper than the root directory is not possible.\n");
+				
+			#ifndef TEST
+				printf("Going upper than the root directory is not possible.");
 
 				destroy_stack(&stack);
 
-				free(input_string);
-				free(buffer      );
+				free(input_string );
+				free(output_string);
+				free(buffer       );
 
 				return 0;
+			#else
+				char* error = "Going upper than the root directory is not possible.";
+
+				while(error[path_size] != '\0') {
+					output_string[path_size] = error[path_size];
+					++path_size;
+				}
+				output_string[path_size] = '\0';
+
+				goto err_label;
+			#endif
 			}	
 
 			prev_dir_size = get_item(&stack, buffer);
@@ -124,7 +175,7 @@ int main() {
 
 			else {
 				put_item(&stack, dir_ptr, dir_size);
-			
+				
 				path_size += (dir_size + 1); 
 			}
 		}
@@ -138,28 +189,60 @@ int main() {
 
 	int item_size = 0;
 	
-	input_string[path_size] = '\0';
+	if(path_size == 0) {
+		output_string[0] = '/';
+		output_string[1] = '\0';
+	}
+	
+	else
+		output_string[path_size] = '\0';
 
 	while(path_size > 0) {
 
 		item_size = get_item(&stack, buffer);
 
 		for(int i = path_size - item_size, j = 0; i < path_size, j < item_size; ++i, ++j)
-			input_string[i] = buffer[j];
+			output_string[i] = buffer[j];
 
-		input_string[path_size - item_size - 1] = '/';
+		output_string[path_size - item_size - 1] = '/';
 
 		path_size -= (item_size + 1);
 
 	}
 
-	printf("Canon form of the path: \n");
-	printf("%s\n", input_string);
+#ifdef TEST
+err_label:
+		result = comp_str (output_string, expectation[test_num], 1);
 
-	destroy_stack(&stack);
+		printf("\n------------------------------------------------------------\n");	
+		printf("Test #%d\n", test_num + 1);
+		printf("Input  string: %s\n", input_data [test_num]);
+		printf("Output string: %s\n", output_string         );
+		printf("Expectation  : %s\n", expectation[test_num]);
+		
+		printf("Result: %d", result);
+		printf("\n------------------------------------------------------------\n");	
 
+		++test_num;
+
+		success += result;
+
+		if(test_num < 4)
+			goto test_label;
+		else
+			printf("Summary: %d/4 tests were completed\n", success);
+#else
+	printf("%s", output_string);
+#endif
+
+	destroy_stack (&stack);
+
+	free (buffer       );
+	free (output_string);
+
+#ifndef TEST
 	free(input_string);
-	free(buffer      );
+#endif
 
 	return 0;
 
