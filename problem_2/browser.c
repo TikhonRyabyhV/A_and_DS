@@ -2,10 +2,28 @@
 #include "list.h"
 #include "browser_funcs.h"
 #include "breakers.h"
-
+#define TEST
 
 int main() {
 	
+
+#ifdef TEST
+	char* input_data[4][9] = {
+		{"", "visit google.com", "back 2", "back 1", "forward 1", "\n", "", "", ""},
+		{"", "visit google.com", "visit linux.org", "visit youtube.com", "back 1", "visit facebook.com", "back 1", "forward 1", "\n"},
+		{"", "visit google.com", "visit mail.ru", "back 23", "forward 1", "visit vk.ru", "forward 1", "\n", ""},
+		{"", "back 3", "visit mipt.ru", "forward 45", "visit google.com", "visit mail.ru", "back 1", "\n", "" }
+	};
+
+	char* expectation[4][8] = {
+		{"homepage", "google.com", "homepage", "homepage", "google.com", "", "", ""},
+		{"homepage", "google.com", "linux.org", "youtube.com", "linux.org", "facebook.com", "linux.org", "facebook.com"},
+		{"homepage", "google.com", "mail.ru", "homepage", "google.com", "vk.ru", "vk.ru", ""},
+		{"homepage", "homepage", "mipt.ru", "mipt.ru", "google.com", "mail.ru", "google.com", ""}
+	};
+
+	int test_num = 0, success = 0;
+#endif
 	int i = 0, shift = 0;
 
 	char* history = NULL;
@@ -19,8 +37,10 @@ int main() {
 	list_member_st* tmp = NULL;	
 
 	char* input_str = NULL;
+#ifndef TEST
 	input_str = calloc(MAX_SIZE, sizeof(char));
 	func_breaker(input_str != NULL)
+#endif
 
 	command_st cur_com;
 	cur_com.arg_size = 1;
@@ -29,6 +49,12 @@ int main() {
 	cur_com.arg_str = calloc(MAX_URL, sizeof(char));
 	func_breaker(cur_com.arg_str != NULL)
 	cur_com.arg_str[0] = '\0';
+
+#ifdef TEST
+test_label:
+	i     = 0;
+	shift = 0;
+#endif
 
 	{ //creating homepage
 		char string[9] = "homepage";
@@ -42,7 +68,12 @@ int main() {
 	}
 
 	do {
+	#ifndef TEST
 		func_breaker(input_str == fgets(input_str, MAX_SIZE, stdin))
+	#else
+		input_str = input_data[test_num][i];
+	#endif
+
 		get_command (&cur_com, input_str, MAX_SIZE);
 
 		//printf("Command %d: opcode - %d, arg_num - %d, arg_size - %d, arg_str - %s\n", i, cur_com.opcode, cur_com.arg_num, cur_com.arg_size, cur_com.arg_str);
@@ -119,14 +150,48 @@ int main() {
 
 	} while(input_str[0] != '\n');
 
+	clear_list(&browser_list);
 
-	printf("Browser history: \n");
+#ifndef TEST
 	for(int j = 0; j < i; ++j)
 		printf("%s\n", &(history[j * MAX_URL]));
+#else
+	int result = 1;
+	for(int j = 0; j < i; ++j)
+		result *= comp_str (&(history[j * MAX_URL]), expectation[test_num][j], 1); 
 
+	if(result)
+		++success;
+	
+	printf("\n-----------------------------------------------------\n");
+	printf("\nTest #%d", test_num + 1);
+	printf("\nInput: \n");
+	int j = 1;
+	while(input_data[test_num][j][0] != '\n') {
+		printf("%s\n", input_data[test_num][j]);
+		++j;
+	}
+
+	printf("\nOutput: \n");
+	for(j = 0; j < i; ++j)
+		printf("%s\n", &(history[j * MAX_URL]));
+
+	printf("Result: %d\n", result);
+	printf("\n-----------------------------------------------------\n");
+
+	++test_num;
+
+	if(test_num < 4)
+		goto test_label;
+	else
+		printf("Summary: %d/4 tests was completed\n", success); 
+#endif
 	free(history        );
-	free(input_str      );
 	free(cur_com.arg_str);
+
+#ifndef TEST
+	free(input_str);
+#endif
 
 
 	return 0;

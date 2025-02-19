@@ -6,4 +6,8 @@ build: $(OBJECTS)
 	@ gcc -g -fsanitize=address -fsanitize=undefined -o out $(OBJECTS)
 	@ rm -f *.o
 	@ echo "Success"
+test: $(OBJECTS)
+	@ gcc -DTEST -g -fsanitize=address -fsanitize=undefined -o out $(OBJECTS)
+	@ rm -f *.o
+	@ echo "Success"
 .SUFFIXES: .c.o
