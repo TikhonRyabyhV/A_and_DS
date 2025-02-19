@@ -2,7 +2,6 @@
 #include "list.h"
 #include "browser_funcs.h"
 #include "breakers.h"
-#define TEST
 
 int main() {
 	
