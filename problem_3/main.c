@@ -19,6 +19,8 @@ int main () {
 		for (int i = 0; i < 10; ++i)
 			printf("%d, ", array[i]);
 		printf("]\n");
+
+		printf("-----------------------------------");
 	}
 
 	{
@@ -35,6 +37,8 @@ int main () {
 		for (int i = 0; i < 10; ++i)
 			printf("%d, ", array[i]);
 		printf("]\n");
+		
+		printf("-----------------------------------");
 	}
 
 	{
@@ -51,6 +55,8 @@ int main () {
 		for (int i = 0; i < 10; ++i)
 			printf("%d, ", array[i]);
 		printf("]\n");
+		
+		printf("-----------------------------------");
 	}
 
 

@@ -8,7 +8,7 @@ void swap (int* a, int* b) {
 	void_func_breaker(b != NULL)
 
 	(*a) = (*a) ^ (*b);
-	(*b) = (*a) ^ (*b);
+	(*b) = (*b) ^ (*a);
 	(*a) = (*a) ^ (*b);
 
 	return;
@@ -22,11 +22,25 @@ void bubble_sort (int* array, int size) {
 
 	void_func_breaker(size > 0)
 
+#ifdef DEBUG
+	int step = 0;
+
+	printf("\nBubble sort:\n");
+#endif
+
 	for (int i = 1; i < size; ++i) {
 		for (int j = 0; j < size - i; ++j) {
 			if (array[j] > array[j + 1]) {
 				swap (array + j, array + j + 1);
 			}
+		#ifdef DEBUG
+			++step;
+
+			printf("Step: %d. Array: \n[ ", step);
+			for (int i = 0; i < size; ++i)
+				printf("%d, ", array[i]);
+			printf("]\n");
+		#endif
 		}
 	}
 
