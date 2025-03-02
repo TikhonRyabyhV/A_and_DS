@@ -91,10 +91,10 @@ int main () {
 
 	unsigned long long TimeValue = 0;
 	
-	unsigned long long* work_time = calloc (3 * 5, sizeof(unsigned long long));
+	unsigned long long* work_time = calloc (4 * 5, sizeof(unsigned long long));
 	func_breaker(work_time != NULL)
 
-	void (*sort_funcs[3]) (int*, int) = {bubble_sort, bubble_sort_check, shaker_sort}; 
+	void (*sort_funcs[4]) (int*, int) = {bubble_sort, bubble_sort_check, shaker_sort, comb_sort}; 
 
 	for (int i = 20; i <= 100; i += 20) {
 		
@@ -119,7 +119,7 @@ int main () {
 
 			shuffle_array (input_arr, j, i);
 
-			for (int k = 0; k < 3; ++k) {
+			for (int k = 0; k < 4; ++k) {
 				
 				copy_array (input_arr, output_arr, j);
 				
@@ -149,14 +149,14 @@ int main () {
 		}
 			
 		
-		if(count == 15) {
+		if(count == 20) {
 
 			printf ("-----------------------\n");
 			file = fopen (file_name[file_cnt], "w");
 
 			func_breaker(file != NULL)
 
-			for (int n = 0; n < 3; ++n) {
+			for (int n = 0; n < 4; ++n) {
 				for (int m = 0; m < 5; ++m) {
 					fprintf (file, "%llu ", work_time[n * 5 + m]);
 				}

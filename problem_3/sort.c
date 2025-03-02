@@ -148,3 +148,38 @@ void shaker_sort (int* array, int size) {
 	return;
 
 }
+
+void comb_sort (int* array, int size) {	
+	
+	void_func_breaker(array != NULL)
+
+	void_func_breaker(size > 0)
+
+	int swaps = 0;
+	int step  = size;
+
+	while(size > 1) {
+		
+		step /= 1.247f;
+
+		if (step < 1) {
+			step = 1;
+		}
+
+		swaps = 0;
+
+		for (int i = 0; i + step < size; ++i) {
+			if(array[i] > array[i + step]) {
+				swap(array + i, array + i + step);
+				swaps = i;
+			}
+		}
+
+		if(step == 1) {
+			size = swaps + 1;
+		}
+	}
+
+	return;
+
+}

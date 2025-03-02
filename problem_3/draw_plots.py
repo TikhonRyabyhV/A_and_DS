@@ -14,18 +14,23 @@ for i in range(5):
         for line in f:
             data.append([float(x) for x in line.split()])
 
-x_axis = [10, 100, 1000, 10000, 100000]
+x_axis = [1, 2, 3, 4, 5]
 
-fig = plt.figure(figsize=(7, 10))
+fig = plt.figure(figsize=(15, 10))
 plot = fig.add_subplot()
 
-plot.plot(x_axis, data[12], 'o', ms = 4, ls = '--', lw = 0.5, label = r'$Bubble      $')
-plot.plot(x_axis, data[13], 'o', ms = 4, ls = '--', lw = 0.5, label = r'$Bubble-check$')
-plot.plot(x_axis, data[14], 'o', ms = 4, ls = '--', lw = 0.5, label = r'$Shaker-sort $')
+plot.plot(x_axis, np.log10(data[12]), 'o', ms = 4, ls = '--', lw = 0.5, label = r'Bubble sort           ')
+plot.plot(x_axis, np.log10(data[13]), 'o', ms = 4, ls = '--', lw = 0.5, label = r'Bubble sort with check')
+plot.plot(x_axis, np.log10(data[14]), 'o', ms = 4, ls = '--', lw = 0.5, label = r'Shaker sort           ')
+plot.plot(x_axis, np.log10(data[15]), 'o', ms = 4, ls = '--', lw = 0.5, label = r'Comb sort             ')
 
-plot.set_xlabel('n')
-plot.set_ylabel('time')
+plt.grid(ls = ':')
+
+plot.set_xlabel('log$_{10}$(n)')
+plot.set_ylabel('log$_{10}$(time)')
 plot.legend(loc='best', fontsize=12)
+
+plt.title('Working time from the number of data')
 
 plt.savefig("plot_n.png")
 
@@ -35,22 +40,30 @@ chaos = [20, 40, 60, 80 , 100]
 sort_0 = []
 sort_1 = []
 sort_2 = []
+sort_3 = []
 for i in range(5):
 
-    sort_0.append(data[3 * i + 0][4])
-    sort_1.append(data[3 * i + 1][4])
-    sort_2.append(data[3 * i + 2][4])
+    sort_0.append(data[4 * i + 0][4])
+    sort_1.append(data[4 * i + 1][4])
+    sort_2.append(data[4 * i + 2][4])
+    sort_3.append(data[4 * i + 3][4])
 
-fig = plt.figure(figsize=(7, 10))
+fig = plt.figure(figsize=(15, 10))
 plot = fig.add_subplot()
 
-plot.plot(chaos, sort_0, 'o', ms = 4, ls = '--', lw = 0.5, label = r'$Bubble      $')
-plot.plot(chaos, sort_1, 'o', ms = 4, ls = '--', lw = 0.5, label = r'$Bubble-check$')
-plot.plot(chaos, sort_2, 'o', ms = 4, ls = '--', lw = 0.5, label = r'$Shaker-sort $')
+plot.plot(chaos, np.log10(sort_0), 'o', ms = 4, ls = '--', lw = 0.5, label = r'Bubble sort           ')
+plot.plot(chaos, np.log10(sort_1), 'o', ms = 4, ls = '--', lw = 0.5, label = r'Bubble sort with check')
+plot.plot(chaos, np.log10(sort_2), 'o', ms = 4, ls = '--', lw = 0.5, label = r'Shaker sort           ')
+plot.plot(chaos, np.log10(sort_3), 'o', ms = 4, ls = '--', lw = 0.5, label = r'Comb sort             ')
 
-plot.set_xlabel('%')
-plot.set_ylabel('time')
+plt.grid(ls = ':')
+
+
+plot.set_xlabel('chaos, %')
+plot.set_ylabel('log$_{10}$(time)')
 plot.legend(loc='best', fontsize=12)
+
+plt.title('Working time from the randomness (chaos) of the array')
 
 plt.savefig("plot_chaos.png")
 
