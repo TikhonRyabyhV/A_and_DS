@@ -9,6 +9,7 @@
 #define END_DIGIT   18
 #define DIGIT_LEN   (END_DIGIT - START_DIGIT + 1)
 
+//shuffle array using the Fisher-Yates algorithm 
 void shuffle_array (long long* array, int size, int shuff_part) {
 	
 	void_func_breaker(array != NULL)
