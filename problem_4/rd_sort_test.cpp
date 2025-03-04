@@ -1,7 +1,13 @@
 #include <stdlib.h>
+#include <time.h>
 #include <algorithm>
 #include "radix_sort.h"
 #include "breakers.h"
+
+#define ARR_SIZE 100000
+#define START_DIGIT 6
+#define END_DIGIT   18
+#define DIGIT_LEN   (END_DIGIT - START_DIGIT + 1)
 
 void shuffle_array (long long* array, int size, int shuff_part) {
 	
@@ -88,21 +94,20 @@ int main () {
 
 	unsigned long long TimeValue = 0;
 	
-	unsigned long long* work_time = calloc (24, sizeof(unsigned long long));
+	unsigned long long* work_time = (unsigned long long*) calloc (2 * DIGIT_LEN, sizeof(unsigned long long));
 	func_breaker(work_time != NULL)
 
 
-	for (int i = 1; i < 13; ++i) {
+	//cycle for test, how speeds of these algorithms depend on digit number
+	for (int i = START_DIGIT; i <= END_DIGIT; ++i) {
 		
-		count = 0;
-			
-		input_arr = calloc (ARR_SIZE, sizeof(long long));
+		input_arr = (long long*) calloc (ARR_SIZE, sizeof(long long));
 		func_breaker(input_arr != NULL)
 			
-		output_arr = calloc (ARR_SIZE, sizeof(long long));
+		output_arr = (long long*) calloc (ARR_SIZE, sizeof(long long));
 		func_breaker(output_arr != NULL)
 			
-		expect_arr = calloc (ARR_SIZE, sizeof(long long));
+		expect_arr = (long long*) calloc (ARR_SIZE, sizeof(long long));
 		func_breaker(expect_arr != NULL)
 
 		long long pow10 = power (10, i    );
@@ -115,42 +120,36 @@ int main () {
 		shuffle_array (input_arr, ARR_SIZE, 100);
 
 		
-		{
-		copy_array (input_arr, output_arr, ARR_SIZE);
+		for(int k = 0; k < 2; ++k) {
+			copy_array (input_arr, output_arr, ARR_SIZE);
 				
-		clock_t start = clock();
-		radix_sort (output_arr, ARR_SIZE);
-		work_time [0 * 5 + i - 1] = clock() - start;
+			clock_t start = clock();
+			char* alg_name[] = {"radix sort", "C++ sort"};
+			char* curr_alg = NULL;
 
+			if(k == 0) {
+				radix_sort (output_arr, ARR_SIZE);
 
-		if(cmp_array (expect_arr, output_arr, j)) {
-				printf ("Chaos: 100 %%, digits: %d, sort: radix, res: ok.\n", i);
-				printf ("Time: %llu.\n", work_time [5 * 0 + i - 1]);	
+				curr_alg = alg_name[0];
+			}
+
+			else {
+				std::sort(output_arr, output_arr + ARR_SIZE);
+
+				curr_alg = alg_name[1];
+			}
+
+			work_time [k * DIGIT_LEN + i - START_DIGIT] = clock() - start;
+			
+			if(cmp_array (expect_arr, output_arr, ARR_SIZE)) {
+				printf ("Chaos: 100 %%, digits: %d, sort: %s, res: ok.\n", i, curr_alg);
+				printf ("Time: %llu.\n", work_time [k * DIGIT_LEN + i - START_DIGIT]);	
 				++count;
-		}
+			}
 
-		else {
+			else {
 				printf ("Chaos: 100 %%, digits: %d, sort: radix, res: fail.\n", i); 
-		}
-		}
-		
-		{
-		copy_array (input_arr, output_arr, ARR_SIZE);
-				
-		clock_t start = clock();
-		std::sort (output_arr, output_arr + ARR_SIZE);
-		work_time [1 * 5 + i - 1] = clock() - start;
-
-
-		if(cmp_array (expect_arr, output_arr, j)) {
-				printf ("Chaos: 100 %%, digits: %d, sort: C++ sort, res: ok.\n", i);
-				printf ("Time: %llu.\n", work_time [1 * 0 + i - 1]);	
-				++count;
-		}
-
-		else {
-				printf ("Chaos: 100 %%, digits: %d, sort: C++ sort, res: fail.\n", i); 
-		}
+			}
 		}
 
 		free(input_arr );
@@ -158,7 +157,7 @@ int main () {
 		free(expect_arr);
 	}
 			
-	if(count == 24) {
+	if(count == 2 * DIGIT_LEN) {
 
 		printf ("-----------------------\n");
 		file = fopen ("digits_dep.txt", "w");
@@ -166,16 +165,118 @@ int main () {
 		func_breaker(file != NULL)
 
 		for (int n = 0; n < 2; ++n) {
-			for (int m = 0; m < 13; ++m) {
-				fprintf (file, "%llu ", work_time[n * 5 + m]);
+			for (int m = 0; m < DIGIT_LEN; ++m) {
+				fprintf (file, "%llu ", work_time[n * DIGIT_LEN + m]);
 			}
 
 			fprintf (file, "\n");
 		}
+
+		fclose(file);
 	}
 
-	fclose(file);
 	free(work_time);
+
+	//------------------------------------------------------------------------------------------------------
+
+	//iterations for getting data, how speeds depend on array size and randomness
+	char* file_name[] = {"20.txt", "40.txt", "60.txt", "80.txt", "100.txt"};
+	
+	int zero_cnt = 0, file_cnt = 0;
+
+	work_time = (unsigned long long*) calloc (2 * 6, sizeof(unsigned long long));
+	func_breaker(work_time != NULL)
+
+	for (int i = 20; i <= 100; i += 20) {
+		
+		count    = 0;
+		zero_cnt = 0;
+		
+		for (int j = 10; j <= 1000000; j *= 10) {
+			
+			input_arr = (long long*) calloc (j, sizeof(long long));
+			func_breaker(input_arr != NULL)
+			
+			output_arr = (long long*) calloc (j, sizeof(long long));
+			func_breaker(output_arr != NULL)
+			
+			expect_arr = (long long*) calloc (j, sizeof(long long));
+			func_breaker(expect_arr != NULL)
+
+			for (int k = 0; k < j; ++k) {
+				input_arr [k] = k;
+				expect_arr[k] = k;
+			}
+
+			shuffle_array (input_arr, j, i);
+
+			for (int k = 0; k < 2; ++k) {
+				
+				copy_array (input_arr, output_arr, j);
+				
+				clock_t start = clock();
+				char* alg_name[] = {"radix sort", "C++ sort"}; 
+				char* curr_alg = NULL;
+
+				if(k == 0) {
+					radix_sort (output_arr, j);
+
+					curr_alg = alg_name[0];
+				}
+
+				else {
+					std::sort(output_arr, output_arr + j);
+
+					curr_alg = alg_name[1];
+				}
+
+				work_time [k * 6 + zero_cnt] = clock() - start;
+
+
+				if(cmp_array (expect_arr, output_arr, j)) {
+					printf ("Chaos: %d %%, size: %d, sort: %s, res: ok.\n", i, j, curr_alg);
+					printf ("Time: %llu.\n", work_time [6 * k + zero_cnt]);	
+					++count;
+				}
+
+				else {
+					printf ("Chaos: %d %%, size: %d, sort: %s, res: fail.\n", i, j, curr_alg); 
+				}
+
+			}
+
+			++zero_cnt;
+
+			free(input_arr );
+			free(output_arr);
+			free(expect_arr);
+			
+		}
+			
+		
+		if(count == 12) {
+
+			printf ("-----------------------\n");
+			file = fopen (file_name[file_cnt], "w");
+
+			func_breaker(file != NULL)
+
+			for (int n = 0; n < 2; ++n) {
+				for (int m = 0; m < 6; ++m) {
+					fprintf (file, "%llu ", work_time[n * 6 + m]);
+				}
+
+				fprintf (file, "\n");
+			}
+
+			fclose(file);
+		}
+
+		++file_cnt;
+	}
+
+	free(work_time);
+
 
 	return 0;
 

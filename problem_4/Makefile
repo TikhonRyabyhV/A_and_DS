@@ -8,4 +8,11 @@ build: $(OBJECTS)
 	@ rm -f *.o
 	@ echo "Success"
 
+run:
+	@ ./out
+	@ python3 draw_plots.py
+	@ mv *.txt results
+	@ mv *.png pictures
+	@ echo "Pictures were updated"
+
 .SUFFIXES: .cpp.o
