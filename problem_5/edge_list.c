@@ -1,6 +1,5 @@
 #include <stdlib.h>
-#include "edge_list.h"
-#include "node_list.h"
+#include "node_edge.h"
 #include "breakers.h"
 
 void init_edge_list (edge_list_st* src) {
@@ -51,7 +50,7 @@ void insert_edge (edge_list_st* src, int range, int weight, node_st* prev_node, 
 
 	void_func_breaker(range > 0 && range < (src->list_size + 2))
 
-	node_st* tmp = (node_st *) calloc(1, sizeof(node_st));
+	edge_st* tmp = (edge_st *) calloc(1, sizeof(edge_st));
 	void_func_breaker(tmp != NULL)
 
 	tmp->weight = weight;
@@ -59,7 +58,7 @@ void insert_edge (edge_list_st* src, int range, int weight, node_st* prev_node, 
 	tmp->prev_node = prev_node;
 	tmp->next_node = next_node;
 
-	node_st *prev_member = NULL, *next_member = NULL;
+	edge_st *prev_member = NULL, *next_member = NULL;
 
 	if(src->list_size > 0) {
 		if(range == 1) {
@@ -76,8 +75,8 @@ void insert_edge (edge_list_st* src, int range, int weight, node_st* prev_node, 
 			}
 
 			else {
-				prev_member = goto_member(src, range - 1);
-				next_member = goto_member(src, range    );
+				prev_member = goto_edge(src, range - 1);
+				next_member = goto_edge(src, range    );
 
 				void_func_breaker(prev_member != NULL)
 				void_func_breaker(next_member != NULL)
@@ -109,7 +108,7 @@ void delete_edge (edge_list_st* src, int place) {
 
 	void_func_breaker(place > 0 && place < (src->list_size + 1))
 	
-	list_member_st *tmp = goto_edge(src, place);
+	edge_st *tmp = goto_edge(src, place);
 	void_func_breaker(tmp != NULL)
 
 	edge_st *prev_member = NULL, *next_member = NULL;
@@ -160,7 +159,7 @@ void clear_edge_list (edge_list_st* src) {
 	void_func_breaker(src != NULL)
 
 	while(src->list_size != 0)
-		delete_member(src, src->list_size);
+		delete_edge(src, src->list_size);
 
 	return;
 
