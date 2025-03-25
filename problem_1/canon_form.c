@@ -13,14 +13,17 @@ int comp_str (char* a, char* b, int size) {
 	func_breaker(a != NULL)
 	func_breaker(b != NULL)
 
-	for(int i = 0; i < size; ++i)
-		if(a[i] != b[i])
+	for(int i = 0; i < size; ++i) {
+		if(a[i] != b[i]) {
 			return 0;
+		}
+	}
 
 	return 1;
 
 }
 
+//returns pointer to the first char that is not '/'
 int skip_slashes (char* src, int start) {
 	
 	func_breaker(src != NULL)
@@ -28,23 +31,26 @@ int skip_slashes (char* src, int start) {
 
 	int i = start;
 
-	while(src[i] == '/')
+	while(src[i] == '/') {
 		++i;
+	}
 
 	return i;
 
 }
 
+//returns when starts directory name and its length
 int get_dir(char* src, int start) {
 
-	func_breaker(src      != NULL)
+	func_breaker(src != NULL)
 
 	func_breaker(start >= 0 )
 
 	int i = start;
 
-	while(src[i] != '/' && src[i] != '\0') 
+	while(src[i] != '/' && src[i] != '\0') {
 		++i;
+	}
 
 	return i;
 
@@ -94,8 +100,10 @@ int main() {
 	func_breaker(input_string == fgets(input_string, PATH_MAX, stdin))
 	
 	int k = 0;
-	while(input_string[k] != '\n')
+	while(input_string[k] != '\n') {
 		++k;
+	}
+
 	input_string[k] = '\0';
 #else
 test_label:
@@ -117,8 +125,9 @@ test_label:
 		cur_char = skip_slashes(input_string, cur_char);
 
 		dir_ptr = &(input_string[cur_char]);
-		if(input_string[cur_char] == '\0')
+		if(input_string[cur_char] == '\0') {
 			break;
+		}
 
 		dir_size = cur_char;
 
@@ -194,15 +203,18 @@ test_label:
 		output_string[1] = '\0';
 	}
 	
-	else
+	else {
 		output_string[path_size] = '\0';
+	}
 
 	while(path_size > 0) {
 
 		item_size = get_item(&stack, buffer);
 
-		for(int i = path_size - item_size, j = 0; i < path_size, j < item_size; ++i, ++j)
+		for(int i = path_size - item_size, j = 0;
+			i < path_size, j < item_size; ++i, ++j) {
 			output_string[i] = buffer[j];
+		}
 
 		output_string[path_size - item_size - 1] = '/';
 
@@ -227,12 +239,18 @@ err_label:
 
 		success += result;
 
-		if(test_num < 4)
+		if(test_num < 4) {
 			goto test_label;
-		else
+		}
+
+		else {
 			printf("Summary: %d/4 tests were completed\n", success);
+		}
+
 #else
+
 	printf("%s", output_string);
+
 #endif
 
 	destroy_stack (&stack);
@@ -241,7 +259,9 @@ err_label:
 	free (output_string);
 
 #ifndef TEST
+
 	free(input_string);
+
 #endif
 
 	return 0;

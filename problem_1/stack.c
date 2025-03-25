@@ -24,12 +24,16 @@ void destroy_stack (char_stack_st* src) {
 	
 	void_func_breaker(src != NULL)
 	
-	if(src->char_array == NULL)
+	if(src->char_array == NULL) {
 		return;
+	}
+
 	free(src->char_array);
 	
-	if(src->size_array == NULL)
+	if(src->size_array == NULL) {
 		return;
+	}
+
 	free(src->size_array);
 
 	src->cur_member = -1;
@@ -85,19 +89,25 @@ void put_item (char_stack_st* src, char* item, int size) {
 
 	void_func_breaker(size > 0)
 
-	if(((double) src->cur_member + 1) / ((double) src->member_cnt) >= 0.8)
+	if(((double) src->cur_member + 1) /
+	   ((double) src->member_cnt) >= 0.8) {
 		grow_member_cnt(src);
+	}
 	
-	if(((double) src->used_char) / ((double) src->used_char + src->free_char) >= 0.8)
+	if(((double) src->used_char) /
+	   ((double) src->used_char + src->free_char) >= 0.8) {
 		grow_stack(src, src->used_char + src->free_char);
+	}
 	
-	if(size > src->free_char)
+	if(size > src->free_char) {
 		grow_stack(src, src->used_char + size);
+	}
 
 	char* start_ptr = &(src->char_array[src->used_char]);
 
-	for(int i = 0; i < size; i++)
+	for(int i = 0; i < size; i++) {
 		start_ptr[i] = item[i];
+	}
 	
 	src->cur_member++;
 	src->size_array[src->cur_member] = size;
@@ -119,8 +129,9 @@ int get_item (char_stack_st* src, char* buffer) {
 	int   item_size = src->size_array[src->cur_member];
 	char* start_ptr = &(src->char_array[src->used_char - item_size]);
 
-	for(int i = 0; i < item_size; i++)
+	for(int i = 0; i < item_size; i++) {
 		buffer[i] = start_ptr[i];
+	}
 
 	src->cur_member--;
 
