@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include "node_edge.h"
+#include "graph.h"
 #include "breakers.h"
 
 int comp_str (char* a, char* b, int size) {
@@ -75,9 +75,9 @@ node_st* find_node (node_list_st* src, char* str, int size, int* place) {
 
 	result = src->first_member;
 
-	int count = 0;
+	int count = 1;
 
-	while(count < src->list_size) {
+	while(result != NULL) {
 		
 		if(result->size == size) {
 			if(comp_str(result->str, str, size)) {
@@ -102,6 +102,31 @@ node_st* find_node (node_list_st* src, char* str, int size, int* place) {
 
 }
 
+int find_node_place (node_list_st* src, node_st* ptr) {
+
+	func_breaker(src != NULL)
+	func_breaker(ptr != NULL)
+
+	node_st* tmp = src->first_member;
+	int place = 1;
+
+	while (tmp != NULL) {
+		
+		if(tmp == ptr) {
+			return place;
+		}
+
+		else {
+			tmp = tmp->next_member;
+			++place;
+		}
+
+	}
+
+	return 0;
+
+}
+
 void insert_node (node_list_st* src, int range, char* str, int size) {
 
 	void_func_breaker(src != NULL)
@@ -115,6 +140,8 @@ void insert_node (node_list_st* src, int range, char* str, int size) {
 
 	init_edge_list (&tmp-> input_edges);
 	init_edge_list (&tmp->output_edges);
+
+	tmp->value = NOT_MARKED;
 		
 	tmp->str = calloc(size, sizeof(char));
 	void_func_breaker(tmp->str != NULL)
@@ -167,14 +194,24 @@ void insert_node (node_list_st* src, int range, char* str, int size) {
 
 }
 
-void delete_node (node_list_st* src, int place) {
+void delete_node (node_list_st* src, node_st* ptr, int place) {
 	
 	void_func_breaker(src != NULL)
 
-	void_func_breaker(place > 0 && place < (src->list_size + 1))
+	void_func_breaker(place >= 0 && place < (src->list_size + 1))
 	
-	node_st *tmp = goto_node(src, place);
-	void_func_breaker(tmp != NULL)
+	node_st* tmp = ptr;
+	if(ptr == NULL) {
+		tmp = goto_node(src, place);
+		void_func_breaker(tmp != NULL)
+	}
+
+	else {
+		if(place == 0) {
+			place = find_node_place (src, ptr);
+			void_func_breaker(place > 0)
+		}
+	}
 
 	node_st *prev_member = NULL, *next_member = NULL;
 
@@ -227,7 +264,7 @@ void clear_node_list (node_list_st* src) {
 	void_func_breaker(src != NULL)
 
 	while(src->list_size != 0)
-		delete_node(src, src->list_size);
+		delete_node(src, NULL, src->list_size);
 
 	return;
 

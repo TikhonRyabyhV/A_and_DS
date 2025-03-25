@@ -1,4 +1,4 @@
-OBJECTS=	node_list.o edge_list.o graph.o test.o
+OBJECTS=	stack.o node_list.o edge_list.o graph.o test.o
 
 .c.o:
 	@ gcc -c -o $@ $<

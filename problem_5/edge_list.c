@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include "node_edge.h"
+#include "graph.h"
 #include "breakers.h"
 
 void init_edge_list (edge_list_st* src) {
@@ -23,21 +23,79 @@ edge_st* goto_edge (edge_list_st* src, int place) {
 	if(src->list_size < place || place <= 0)
 		return NULL;
 
-	edge_st* result = NULL;
+	edge_st* result = src->first_member;
+	--place;
 
-	if(place < (src->list_size / 2)) {
-		result = src->first_member;
-		for(int i = 1; i < place; ++i)
-		       result = result->next_member;	
-	}
-
-	else {
-		result = src->last_member;
-		for(int i = src->list_size; i > place; --i)
-			result = result->prev_member;
+	while (place > 0) {
+		result = result->next_member;
+		--place;
 	}
 
 	return result;
+
+}
+
+edge_st* find_edge (edge_list_st* src, char* prev_name, char* next_name, int prev_size, int next_size, int* place) {
+
+	if(src == NULL || prev_name == NULL || next_name == NULL)
+		return NULL;
+	
+	if(prev_size <= 0 || next_size <= 0)
+		return NULL;
+
+	edge_st* tmp = src->first_member;
+
+	int cnt = 1;
+
+	while (tmp != NULL) {
+		
+		if(tmp->prev_node->size == prev_size &&
+		   tmp->next_node->size == next_size   ) {
+		
+			if(comp_str(tmp->prev_node->str, prev_name, prev_size) &&
+			   comp_str(tmp->next_node->str, next_name, next_size)   ) {
+
+				if(place != NULL) {
+					(*place) = cnt;
+				}
+
+				return tmp;
+
+			}
+
+		}
+
+		tmp = tmp->next_member;
+		++cnt;
+	
+	}
+
+	return tmp;
+
+}
+
+int find_edge_place (edge_list_st* src, edge_st* ptr) {
+	
+	func_breaker(src != NULL)
+	func_breaker(ptr != NULL)
+
+	edge_st* tmp = src->first_member;
+	int place = 1;
+
+	while (tmp != NULL) {
+		
+		if(tmp == ptr) {
+			return place;
+		}
+
+		else {
+			tmp = tmp->next_member;
+			++place;
+		}
+
+	}
+
+	return 0;
 
 }
 
@@ -102,14 +160,24 @@ void insert_edge (edge_list_st* src, int range, int weight, node_st* prev_node, 
 
 }
 
-void delete_edge (edge_list_st* src, int place) {
+void delete_edge (edge_list_st* src, edge_st* ptr, int place) {
 	
 	void_func_breaker(src != NULL)
 
-	void_func_breaker(place > 0 && place < (src->list_size + 1))
+	void_func_breaker(place >= 0 && place < (src->list_size + 1))
 	
-	edge_st *tmp = goto_edge(src, place);
-	void_func_breaker(tmp != NULL)
+	edge_st* tmp = ptr;
+	if(ptr == NULL) {
+		tmp = goto_edge(src, place);
+		void_func_breaker(tmp != NULL)
+	}
+
+	else {
+		if(place == 0) {
+			place = find_edge_place (src, ptr);
+			void_func_breaker(place > 0)
+		}
+	}
 
 	edge_st *prev_member = NULL, *next_member = NULL;
 
@@ -159,7 +227,7 @@ void clear_edge_list (edge_list_st* src) {
 	void_func_breaker(src != NULL)
 
 	while(src->list_size != 0)
-		delete_edge(src, src->list_size);
+		delete_edge(src, NULL, src->list_size);
 
 	return;
 
