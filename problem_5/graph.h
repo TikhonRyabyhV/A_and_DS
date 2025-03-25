@@ -26,6 +26,9 @@ typedef struct edge_list {
 //----------------------------------------------------------------------------------------------------
 
 #define NOT_MARKED 0-1
+#define NOT_VISITED 0
+#define VISITED     1
+#define INF        0-1
 
 typedef struct node {
 
@@ -33,6 +36,7 @@ typedef struct node {
         int   size;
 
 	int value;
+	int visit;
 
         struct edge_list  input_edges;
         struct edge_list output_edges;
@@ -54,10 +58,11 @@ typedef struct node_list {
 
 //----------------------------------------------------------------------------------------------------
 
-#define OK     0-1
-#define NO_A   0-2
-#define NO_B   0-3
-#define NO_A_B 0-4
+#define OK      0-1
+#define NO_A    0-2
+#define NO_B    0-3
+#define NO_A_B  0-4
+#define NO_EDGE 0-5
 
 
 typedef struct graph {
@@ -120,6 +125,8 @@ int graph_del_edge (graph_st* src, char* name_prev, char* name_next, int size_pr
 void destroy_graph (graph_st* src);
 
 void graph_RPO (graph_st* src, char_stack_st* order, edge_st** loops, int* loops_size, node_st* start_node);
+
+void graph_Dijkstra (graph_st* src, node_st* start_node);
 
 //----------------------------------------------------------------------------------------------------
 

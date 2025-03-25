@@ -9,16 +9,11 @@ int comp_str (char* a, char* b, int size) {
 	func_breaker(a != NULL)
 	func_breaker(b != NULL)
 
-	int i = 0;
-	while(a[i] != '\0' && b[i] != '\0') {
-		if(a[i] != b[i])
+	for(int i = 0; i < size; ++i) {
+		if(a[i] != b[i]) {
 			return 0;
-		else
-			++i;
+		}
 	}
-
-	if(a[i] != b[i])
-		return 0;
 
 	return 1;
 
@@ -141,7 +136,8 @@ void insert_node (node_list_st* src, int range, char* str, int size) {
 	init_edge_list (&tmp-> input_edges);
 	init_edge_list (&tmp->output_edges);
 
-	tmp->value = NOT_MARKED;
+	tmp->visit = NOT_VISITED;
+	tmp->value = NOT_MARKED ;
 		
 	tmp->str = calloc(size, sizeof(char));
 	void_func_breaker(tmp->str != NULL)

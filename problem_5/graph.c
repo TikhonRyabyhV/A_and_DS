@@ -81,7 +81,7 @@ int graph_del_edge (graph_st* src, char* name_prev, char* name_next, int size_pr
 
 	if(tmp == NULL) {
 		node_st* prev_node = find_node (&src->nodes, name_prev, size_prev, NULL);
-		node_st* next_node = find_node (&src->nodes, name_prev, size_prev, NULL);
+		node_st* next_node = find_node (&src->nodes, name_next, size_next, NULL);
 
 		if(prev_node == NULL) {
 
@@ -101,8 +101,12 @@ int graph_del_edge (graph_st* src, char* name_prev, char* name_next, int size_pr
 				return NO_B;
 			}
 
-		}
+			else {
+				return NO_EDGE;
+			}
 
+		}
+		
 	}
 
 	node_st* prev_node = tmp->prev_node;
@@ -273,6 +277,17 @@ void graph_RPO (graph_st* src, char_stack_st* order, edge_st** loops, int* loops
 	void_func_breaker(loops       != NULL)
 	void_func_breaker(loops_size  != NULL)
 	void_func_breaker(start_node  != NULL)
+	
+	// initialization
+	node_st* tmp_node = src->nodes.first_member;
+
+	while (tmp_node != NULL) {
+		tmp_node->visit = NOT_VISITED;
+		tmp_node->value = NOT_MARKED ;
+
+		tmp_node = tmp_node->next_member;
+	}
+	// -----------------------------------------
 
 	int N = src->nodes.list_size;
 
@@ -349,5 +364,70 @@ void graph_RPO (graph_st* src, char_stack_st* order, edge_st** loops, int* loops
 	free(queue);
 
 	return;
+
+}
+
+void graph_Dijkstra (graph_st* src, node_st* start_node) {
+
+	void_func_breaker(src        != NULL)
+	void_func_breaker(start_node != NULL)
+
+	// initialization
+	node_st* tmp_node = src->nodes.first_member;
+
+	while (tmp_node != NULL) {
+		tmp_node->visit = NOT_VISITED;
+		tmp_node->value = INF        ;
+
+		tmp_node = tmp_node->next_member;
+	}
+	
+	start_node->value = 0;
+
+	int min = 0; // min value of not visited nodes
+	node_st* current_node = NULL;
+	edge_st* tmp_edge = NULL;
+
+	tmp_node = start_node;
+
+	// steps
+	do {
+		// work with current node
+		tmp_edge = tmp_node->output_edges.first_member;
+
+		while (tmp_edge != NULL) {
+			if(tmp_edge->next_node->visit == NOT_VISITED &&
+			  (tmp_edge->next_node->value == INF         ||
+			   tmp_edge->next_node->value >  
+			   tmp_node->value + tmp_edge->weight)) {
+				tmp_edge->next_node->value = tmp_node->value + tmp_edge->weight;	
+			}
+
+			tmp_edge = tmp_edge->next_member;
+		}
+
+		tmp_node->visit = VISITED;
+		// ------------------------------------------------------------------------------
+		
+		// looking for nest node with low value
+		min = INF;
+		tmp_node = src->nodes.first_member;
+
+		while (tmp_node != NULL) {
+			if((min > tmp_node->value ||
+			  (min == INF && tmp_node->value != INF))
+			  && tmp_node->visit == NOT_VISITED     ) {
+				min = tmp_node->value;
+
+				current_node = tmp_node;
+			}
+
+			tmp_node = tmp_node->next_member;
+		}
+
+		tmp_node = current_node;
+		// -------------------------------------------------------------------------------
+
+	} while (min != INF);
 
 }
