@@ -219,14 +219,15 @@ void print_graph (graph_st* src) {
 	for (tmp_node = src->nodes.first_member; tmp_node != NULL;
              tmp_node = tmp_node->next_member                    ) {
 
-		printf("Node %s, edges: ", tmp_node->str);
+		printf("Node %s (%d), edges: ", tmp_node->str, tmp_node->value);
 
 		printf("\ninput: ");
 
 		for (tmp_edge = tmp_node->input_edges.first_member; tmp_edge != NULL;
 		     tmp_edge = tmp_edge->next_member                               ) {
 			
-			printf("%s -> %s | ", tmp_edge->prev_node->str, tmp_edge->next_node->str);
+			printf("%s -> %s (%d) | ", tmp_edge->prev_node->str,
+				       	           tmp_edge->next_node->str, tmp_edge->weight);
 
 		}
 
@@ -235,7 +236,8 @@ void print_graph (graph_st* src) {
 		for (tmp_edge = tmp_node->output_edges.first_member; tmp_edge != NULL;
 		     tmp_edge = tmp_edge->next_member                               ) {
 			
-			printf("%s -> %s | ", tmp_edge->prev_node->str, tmp_edge->next_node->str);
+			printf("%s -> %s (%d) | ", tmp_edge->prev_node->str,
+				              	   tmp_edge->next_node->str, tmp_edge->weight);
 
 		}
 
@@ -399,7 +401,7 @@ void graph_Dijkstra (graph_st* src, node_st* start_node) {
 			if(tmp_edge->next_node->visit == NOT_VISITED &&
 			  (tmp_edge->next_node->value == INF         ||
 			   tmp_edge->next_node->value >  
-			   tmp_node->value + tmp_edge->weight)) {
+			   (tmp_node->value + tmp_edge->weight))) {
 				tmp_edge->next_node->value = tmp_node->value + tmp_edge->weight;	
 			}
 
@@ -414,14 +416,14 @@ void graph_Dijkstra (graph_st* src, node_st* start_node) {
 		tmp_node = src->nodes.first_member;
 
 		while (tmp_node != NULL) {
-			if((min > tmp_node->value ||
-			  (min == INF && tmp_node->value != INF))
-			  && tmp_node->visit == NOT_VISITED     ) {
+			if(((min > tmp_node->value && tmp_node->value != INF) ||
+			              (min == INF && tmp_node->value != INF))
+			               && tmp_node->visit == NOT_VISITED     ) {
 				min = tmp_node->value;
 
 				current_node = tmp_node;
 			}
-
+			
 			tmp_node = tmp_node->next_member;
 		}
 

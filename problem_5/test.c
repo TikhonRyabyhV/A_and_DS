@@ -17,12 +17,12 @@ int main() {
 	print_graph (&my_graph);
 
 	// ---------------------------------------------
-	graph_add_edge (&my_graph, 1, "A", "B", 2, 2);
-	graph_add_edge (&my_graph, 5, "B", "C", 2, 2);
-	graph_add_edge (&my_graph, 2, "A", "C", 2, 2);
-	graph_add_edge (&my_graph, 9, "A", "D", 2, 2);
-	graph_add_edge (&my_graph, 9, "D", "C", 2, 2);
-	graph_add_edge (&my_graph, 6, "B", "A", 2, 2);
+	graph_add_edge (&my_graph, 2, "A", "B", 2, 2);
+	graph_add_edge (&my_graph, 7, "B", "C", 2, 2);
+	//graph_add_edge (&my_graph, 2, "A", "C", 2, 2);
+	graph_add_edge (&my_graph, 5, "A", "D", 2, 2);
+	//graph_add_edge (&my_graph, 9, "D", "C", 2, 2);
+	//graph_add_edge (&my_graph, 6, "B", "A", 2, 2);
 	
 	print_graph (&my_graph);
 

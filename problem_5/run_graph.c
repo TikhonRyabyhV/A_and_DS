@@ -82,7 +82,7 @@ int get_num (char* src) {
 
 	char buffer[100];
 
-	while('1' <= src[i] && src[i] <= '9') {
+	while(('1' <= src[i] && src[i] <= '9') || src[i] == '0') {
 		buffer[j] = src[i];
 		++i;
 		++j;
@@ -184,10 +184,6 @@ int main () {
 	int errors = OK;
 
 	int stop = 0;
-
-
-	node_st* start_node = NULL;
-	node_st* tmp_node   = NULL;
 
 	char_stack_st order;
 	edge_st** loops = NULL;
@@ -311,7 +307,8 @@ int main () {
 					graph_RPO (&graph, &order, loops, &loops_size, start_node);
 
 
-					for(int i = 0; i < N; ++i) {
+					int end_i = order.cur_member + 1;
+					for(int i = 0; i < end_i; ++i) {
 						get_item (&order, buffer);
 
 						printf("%s ", buffer);
@@ -334,11 +331,15 @@ int main () {
 
 			case 6:
 				if (res == 1) {
-					start_node = find_node (&graph.nodes, str_1, size_1, NULL);
-				
+					node_st* start_node = find_node (&graph.nodes, str_1, size_1, NULL);
+
+					if(start_node == NULL) {
+						break;
+					}
+
 					graph_Dijkstra (&graph, start_node);
 
-					tmp_node = graph.nodes.first_member;
+					node_st* tmp_node = graph.nodes.first_member;
 
 					while (tmp_node != NULL) {
 						if(tmp_node != start_node) {
