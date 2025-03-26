@@ -10,8 +10,8 @@ int get_command (char* src, char** end) {
 	func_breaker(src != NULL)
 	
 	char* commands[] = {"NODE", "EDGE", "REMOVE NODE", "REMOVE EDGE",
-	       	            "RPO_NUMBERING", "DIJKSTRA", "PRINT", "DESTROY", "STOP"};
-	int sizes[] = {4, 4, 11, 11, 13, 8, 5, 7, 4};
+	       	            "RPO_NUMBERING", "DIJKSTRA", "PRINT", "DESTROY", "STOP", "MAX FLOW"};
+	int sizes[] = {4, 4, 11, 11, 13, 8, 5, 7, 4, 8};
 
 	int start = 0;
 	int i = 0;
@@ -50,6 +50,27 @@ int get_command (char* src, char** end) {
 
 		return 3 * comp_str(src + start, "NODE", i - start) + 
 		       4 * comp_str(src + start, "EDGE", i - start);
+	}
+	
+	if(comp_str(src + start, "MAX", i - start)) {
+		
+		while (!('A' <= src[i] && src[i] <= 'Z') && src[i] != '_') {
+			if(src[i] == '\n') {
+				return 0;
+			}
+
+			++i;
+		}
+
+		start = i;
+
+		while (('A' <= src[i] && src[i] <= 'Z') || src[i] == '_') {
+			++i;
+		}
+
+		(*end) = src + i;
+
+		return 10 * comp_str(src + start, "FLOW", i - start);
 	}
 
 	(*end) = src + i;
@@ -364,6 +385,24 @@ int main () {
 
 			case 9:
 				stop = 1;
+
+				break;
+
+			case 10:
+				if (res == 2) {
+					node_st*  start_node = find_node (&graph.nodes, str_1, size_1, NULL);
+					node_st* finish_node = find_node (&graph.nodes, str_2, size_2, NULL);
+					
+					if(start_node == NULL || finish_node == NULL) {
+						break;
+					}
+					
+					int flow = 0;
+
+					flow = graph_max_flow(&graph, start_node, finish_node);
+
+					printf("%d\n", flow);
+				}
 
 				break;
 

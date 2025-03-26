@@ -433,3 +433,208 @@ void graph_Dijkstra (graph_st* src, node_st* start_node) {
 	} while (min != INF);
 
 }
+
+int min (int a, int b) {
+	if(a < b) {
+		return a;
+	}
+
+	else {
+		return b;
+	}
+
+}
+
+int graph_max_flow (graph_st* src, node_st* start_node, node_st* finish_node) {
+	
+	func_breaker(src != NULL)
+	
+	func_breaker(start_node  != NULL)
+	func_breaker(finish_node != NULL)
+
+
+	// intialization
+	int C_min = (int)(1e9);
+
+	node_st* tmp_node = src->nodes.first_member;
+
+	while (tmp_node != NULL) {
+		tmp_node->visit = NOT_VISITED;
+		tmp_node->value = INF        ;
+
+		tmp_node = tmp_node->next_member;
+	}
+
+
+
+	int E = src->edges.list_size;
+	edge_st** back_edges = (edge_st**) calloc (E, sizeof(edge_st*));
+	if(back_edges == NULL) {
+		return 0;
+	}
+	int i = 0;
+
+	edge_st* tmp_edge = src->edges.first_member;
+
+	while (tmp_edge != NULL) {
+		tmp_edge->flow = 0;
+
+		edge_st* back_edge = find_edge (&tmp_edge->prev_node->input_edges,
+						 tmp_edge->next_node->str,
+						 tmp_edge->prev_node->str,
+						 tmp_edge->next_node->size,
+						 tmp_edge->prev_node->size,
+						 NULL                     );
+		if(back_edge == NULL) {
+			graph_add_edge (src, 0, tmp_edge->next_node->str,
+				         	tmp_edge->prev_node->str,
+				         	tmp_edge->next_node->size,
+					 	tmp_edge->prev_node->size);
+
+			back_edge = find_edge (&tmp_edge->prev_node->input_edges,
+						tmp_edge->next_node->str,
+						tmp_edge->prev_node->str,
+						tmp_edge->next_node->size,
+						tmp_edge->prev_node->size,
+						NULL                     );
+			
+			back_edges[i] = back_edge;
+			++i;
+		}
+
+		back_edge->flow = 0;
+
+		tmp_edge = tmp_edge->next_member;
+	}
+	// ----------------------------------------------------------------------------
+
+
+	int result = 0, tmp = 0, timer = VISITED;
+
+	while(tmp = DFS (src, start_node, finish_node, C_min, timer)) {
+		++timer;
+		result += tmp;
+	}
+
+	// remove extra edges
+	for(int j = 0; j < i; ++j) {
+		tmp_edge = back_edges[j];
+
+		graph_del_edge (src, tmp_edge->prev_node->str,
+				     tmp_edge->next_node->str,
+				     tmp_edge->prev_node->size,
+				     tmp_edge->next_node->size);
+	}
+
+	free(back_edges);
+	// ------------------------------------------------------------
+
+	return result;
+
+}
+
+
+int DFS (graph_st* src, node_st* tmp_node, node_st* finish_node, int C_min, int timer) {
+
+	func_breaker(src != NULL)
+	
+	func_breaker(tmp_node    != NULL)
+	func_breaker(finish_node != NULL)
+	
+	if(tmp_node->size == finish_node->size &&
+	   comp_str(tmp_node->str, finish_node->str, tmp_node->size)) {
+		return C_min;
+	}
+
+	tmp_node->visit = timer;
+
+	edge_st* tmp_edge = tmp_node->output_edges.first_member;
+	while (tmp_edge != NULL) {
+		if(tmp_edge->next_node->visit != timer &&
+	           tmp_edge->flow < tmp_edge->weight           ) {
+			int delta = DFS (src, tmp_edge->next_node, finish_node,
+				       	 min(C_min, tmp_edge->weight - tmp_edge->flow), timer);
+
+			if(delta > 0) {
+				tmp_edge->flow += delta;
+				
+				edge_st* back_edge = find_edge (&tmp_edge->prev_node->input_edges,
+						 		 tmp_edge->next_node->str,
+						 		 tmp_edge->prev_node->str,
+						 		 tmp_edge->next_node->size,
+						 		 tmp_edge->prev_node->size,
+						 		 NULL                     );
+				
+				back_edge->flow -= delta;
+
+				return delta;
+			}
+		}
+
+		tmp_edge = tmp_edge->next_member;
+	}
+
+	return 0;
+
+}
+
+/*int find_path (graph_st* src, node_st* start_node, node_st* finish_node, node_st** result) {
+
+	int N = src->nodes.list_size;
+	node_st** queue = (node_st**) calloc(N, sizeof(node_st*));
+
+	node_st** parents = (node_st**) calloc(N, sizeof(node_st*));
+	
+	// initialization
+	node_st* tmp_node = src->nodes.first_member;
+
+	while (tmp_node != NULL) {
+		tmp_node->visit = NOT_VISITED;
+		tmp_node->value = INF        ;
+
+		tmp_node = tmp_node->next_member;
+	}
+	// ------------------------------------------
+	
+	int i = 0, stop = 0;
+	queue[i] = start_node;
+	parents[i] = NULL;
+	queue[i]->visit = VISITED;
+	++i;
+
+	while (i > 0) {
+		--i;
+
+		edge_st* tmp_edge = queue[i]->output_edges.first_member;
+
+		while (tmp_edge != NULL) {
+			if(tmp_edge->next_node->visited == NOT_VISITED) {
+				tmp_edge->next_node->visited = VISITED;
+				parents[i] = queue[i];
+				queue[i] = tmp_edge->next_node;
+
+				++i;
+
+				if(queue[i - 1] == finish_node) {
+					stop = 1;
+					
+					break;
+				}
+			}
+
+			tmp_edge = tmp_edge->next_member;
+		}
+
+		if(stop == 1) {
+			break;
+		}	
+	}
+
+	if(i == 0) {
+		return 0;
+	}
+
+	else {
+		for(int j = 0; j < i; )
+	}
+}*/

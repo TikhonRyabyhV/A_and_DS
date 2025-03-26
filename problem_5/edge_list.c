@@ -112,6 +112,7 @@ void insert_edge (edge_list_st* src, int range, int weight, node_st* prev_node, 
 	void_func_breaker(tmp != NULL)
 
 	tmp->weight = weight;
+	tmp->flow   = 0;
 
 	tmp->prev_node = prev_node;
 	tmp->next_node = next_node;

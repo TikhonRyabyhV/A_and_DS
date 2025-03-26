@@ -21,7 +21,7 @@ int main() {
 	graph_add_edge (&my_graph, 7, "B", "C", 2, 2);
 	//graph_add_edge (&my_graph, 2, "A", "C", 2, 2);
 	graph_add_edge (&my_graph, 5, "A", "D", 2, 2);
-	//graph_add_edge (&my_graph, 9, "D", "C", 2, 2);
+	graph_add_edge (&my_graph, 9, "C", "D", 2, 2);
 	//graph_add_edge (&my_graph, 6, "B", "A", 2, 2);
 	
 	print_graph (&my_graph);
@@ -73,6 +73,13 @@ int main() {
 		tmp_node = tmp_node->next_member;
 	}
 
+	// ---------------------------------------------
+	node_st* finish_node = find_node (&my_graph.nodes, "D", 2, NULL);
+	int flow = 0;
+
+	flow = graph_max_flow(&my_graph, start_node, finish_node);
+
+	printf("Flow: %d\n", flow);
 	// ---------------------------------------------
 	graph_del_edge (&my_graph, "B", "A", 2, 2);
 	

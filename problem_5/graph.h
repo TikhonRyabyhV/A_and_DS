@@ -4,6 +4,7 @@
 typedef struct edge {
 
 	int   weight;
+	int   flow  ;
 
 	struct node* prev_node;
 	struct node* next_node;
@@ -127,6 +128,12 @@ void destroy_graph (graph_st* src);
 void graph_RPO (graph_st* src, char_stack_st* order, edge_st** loops, int* loops_size, node_st* start_node);
 
 void graph_Dijkstra (graph_st* src, node_st* start_node);
+
+int min (int a, int b);
+
+int graph_max_flow (graph_st* src, node_st* start_node, node_st* finish_node);
+
+int DFS (graph_st* src, node_st* tmp_node, node_st* finish_node, int C_min, int timer);
 
 //----------------------------------------------------------------------------------------------------
 
