@@ -1,7 +1,8 @@
 #include <stdlib.h>
 #include "graph.h"
-//#include "stack.h"
 #include "breakers.h"
+
+//#define DEBUG
 
 void init_graph (graph_st* src) {
 	
@@ -485,11 +486,11 @@ int graph_max_flow (graph_st* src, node_st* start_node, node_st* finish_node) {
 		// increase flow on founded path with low capacity
 		
 	#ifdef DEBUG
-		printf("i = %d\n", i);
+		//printf("i = %d\n", i);
 
-		for(int j = i - 1; j >= 0; --j) {
-			printf("Node: %s\n", path[j]->str);
-		}
+		//for(int j = i - 1; j >= 0; --j) {
+		//	printf("Node: %s\n", path[j]->str);
+		//}
 	#endif
 		
 		for(int j = i - 1; j > 0; --j) {
@@ -514,7 +515,9 @@ int graph_max_flow (graph_st* src, node_st* start_node, node_st* finish_node) {
 
 	#ifdef DEBUG
 		printf("tmp = %d\n", tmp);
+		print_graph(src);
 	#endif
+
 
 		i = 0;
 	}
@@ -575,20 +578,24 @@ int DFS (graph_st* src, node_st* tmp_node, node_st* finish_node, int C_min, node
 				min_node = tmp_edge->next_node;
 			}
 		}
-
-		tmp_edge = tmp_edge->next_member;
-	}
-	
-	tmp_node->value = delta_min;
-	
-	tmp_edge = tmp_node->output_edges.first_member;
-	while (tmp_edge != NULL) {
+		
 		if(tmp_edge->next_node->visit == VISITED) {
 			tmp_edge->next_node->visit = NOT_VISITED;
 		}
 
 		tmp_edge = tmp_edge->next_member;
 	}
+	
+	tmp_node->value = delta_min;
+	
+	/*tmp_edge = tmp_node->output_edges.first_member;
+	while (tmp_edge != NULL) {
+		if(tmp_edge->next_node->visit == VISITED) {
+			tmp_edge->next_node->visit = NOT_VISITED;
+		}
+
+		tmp_edge = tmp_edge->next_member;
+	}*/
 
 	// add local path with low capacity to direct path
 	int start = -1, finish = -1;
