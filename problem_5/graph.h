@@ -29,6 +29,7 @@ typedef struct edge_list {
 #define NOT_MARKED 0-1
 #define NOT_VISITED 0
 #define VISITED     1
+#define IN_PROCESS 0-2
 #define INF        0-1
 
 typedef struct node {
@@ -133,7 +134,7 @@ int min (int a, int b);
 
 int graph_max_flow (graph_st* src, node_st* start_node, node_st* finish_node);
 
-int DFS (graph_st* src, node_st* tmp_node, node_st* finish_node, int C_min, int timer);
+int DFS (graph_st* src, node_st* tmp_node, node_st* finish_node, int C_min, node_st** path, int* i);
 
 //----------------------------------------------------------------------------------------------------
 
