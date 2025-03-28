@@ -1,10 +1,14 @@
 #pragma once
 #include "stack.h"
 
+#define NORMAL 0
+#define BACK   1
+
 typedef struct edge {
 
 	int   weight;
 	int   flow  ;
+	int   type  ;
 
 	struct node* prev_node;
 	struct node* next_node;
@@ -84,7 +88,7 @@ edge_st* find_edge (edge_list_st* src, char* prev_name, char* next_name, int pre
 
 int find_edge_place (edge_list_st* src, edge_st* ptr);
 
-void insert_edge (edge_list_st* src, int range, int weight, node_st* prev_node, node_st* next_node);
+void insert_edge (edge_list_st* src, int range, int weight, int type, node_st* prev_node, node_st* next_node);
 
 void delete_edge (edge_list_st* src, edge_st* ptr, int place);
 
@@ -116,7 +120,7 @@ void print_graph (graph_st* src);
 
 void graph_add_node (graph_st* src, char* name, int size);
 
-int  graph_add_edge (graph_st* src, int weight, 
+int  graph_add_edge (graph_st* src, int weight, int type, 
 		     char* name_prev, char* name_next,
 		     int size_prev, int size_next);
 

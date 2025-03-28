@@ -237,7 +237,7 @@ int main () {
 
 			case 2:
 				if (res == 3) {
-					errors = graph_add_edge (&graph, arg, str_1, str_2, size_1, size_2);
+					errors = graph_add_edge (&graph, arg, NORMAL, str_1, str_2, size_1, size_2);
 				
 					switch (errors) {
 						case OK:

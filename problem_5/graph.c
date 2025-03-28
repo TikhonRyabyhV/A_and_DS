@@ -29,7 +29,7 @@ void graph_add_node (graph_st* src, char* name, int size) {
 
 }
 
-int graph_add_edge (graph_st* src, int weight, char* name_prev, char* name_next, int size_prev, int size_next) {
+int graph_add_edge (graph_st* src, int weight, int type, char* name_prev, char* name_next, int size_prev, int size_next) {
 
 	func_breaker(src != NULL)
 	
@@ -58,10 +58,10 @@ int graph_add_edge (graph_st* src, int weight, char* name_prev, char* name_next,
 		}
 	}
 
-	insert_edge (&src->edges, src->edges.list_size + 1, weight, prev_node, next_node);
+	insert_edge (&src->edges, src->edges.list_size + 1, weight, type, prev_node, next_node);
 	
-	insert_edge (&prev_node->output_edges, prev_node->output_edges.list_size + 1, weight, prev_node, next_node);
-	insert_edge (&next_node-> input_edges, next_node-> input_edges.list_size + 1, weight, prev_node, next_node);
+	insert_edge (&prev_node->output_edges, prev_node->output_edges.list_size + 1, weight, type, prev_node, next_node);
+	insert_edge (&next_node-> input_edges, next_node-> input_edges.list_size + 1, weight, type, prev_node, next_node);
 
 	return OK;
 
@@ -457,15 +457,47 @@ int graph_max_flow (graph_st* src, node_st* start_node, node_st* finish_node) {
 	// intialization
 	int C_min = (int)(1e9);
 
+
+	// add back edges
+	edge_st* tmp_edge = src->edges.first_member;
+
+	while (tmp_edge != NULL) {
+		if(tmp_edge->type == NORMAL) {
+			graph_add_edge (src, 0, BACK,
+					tmp_edge->next_node->str,
+					tmp_edge->prev_node->str,
+					tmp_edge->next_node->size,
+					tmp_edge->prev_node->size );
+		
+			tmp_edge->flow = 0;
+		}
+
+		tmp_edge = tmp_edge->next_member;
+	}
+
+	// set all flows as zeros and prepare nodes
 	node_st* tmp_node = src->nodes.first_member;
 
 	while (tmp_node != NULL) {
 		tmp_node->visit = NOT_VISITED;
 		tmp_node->value = INF        ;
 
+		tmp_edge = tmp_node->input_edges.first_member;
+		while (tmp_edge != NULL) {
+			tmp_edge->flow = 0;
+			
+			tmp_edge = tmp_edge->next_member;
+		}
+		
+		tmp_edge = tmp_node->output_edges.first_member;
+		while (tmp_edge != NULL) {
+			tmp_edge->flow = 0;
+			
+			tmp_edge = tmp_edge->next_member;
+		}
+
 		tmp_node = tmp_node->next_member;
 	}
-
 
 	int result = 0, tmp = 0; // final and tmp results for flow
 
@@ -477,7 +509,7 @@ int graph_max_flow (graph_st* src, node_st* start_node, node_st* finish_node) {
 	}
 
 	int i = 0; // path iterator
-	edge_st* tmp_edge = NULL;
+	tmp_edge = NULL;
 
 	while(tmp = DFS (src, start_node, finish_node, C_min, path, &i)) {
 		result += tmp;
@@ -493,6 +525,7 @@ int graph_max_flow (graph_st* src, node_st* start_node, node_st* finish_node) {
 		//}
 	#endif
 		
+		// recalculate flows on the right way
 		for(int j = i - 1; j > 0; --j) {
 			
 			tmp_edge = path[j]->output_edges.first_member;
@@ -509,9 +542,43 @@ int graph_max_flow (graph_st* src, node_st* start_node, node_st* finish_node) {
 				}
 			}
 
-			tmp_edge->flow += tmp;
+			if(tmp_edge->type == NORMAL) {
+				tmp_edge->flow += tmp;
+			}
+
+			else {
+				tmp_edge->flow -= tmp;
+			}
 
 		}
+		
+		// recalculate flows on the back way
+		for(int j = 0; j < i - 1; ++j) {
+			
+			tmp_edge = path[j]->output_edges.first_member;
+				
+			if(tmp_edge == NULL) {
+				return 0;
+			}
+
+			while (tmp_edge->next_node != path[j + 1]) {
+				tmp_edge = tmp_edge->next_member;
+				
+				if(tmp_edge->next_node == NULL) {
+					return 0;
+				}
+			}
+
+			if(tmp_edge->type == NORMAL) {
+				tmp_edge->flow += tmp;
+			}
+
+			else {
+				tmp_edge->flow -= tmp;
+			}
+
+		}
+
 
 	#ifdef DEBUG
 		printf("tmp = %d\n", tmp);
@@ -523,6 +590,27 @@ int graph_max_flow (graph_st* src, node_st* start_node, node_st* finish_node) {
 	}
 
 	free(path);
+
+	// delete extra back edges
+	tmp_edge = src->edges.first_member;
+	edge_st* back_edge = NULL;
+
+	while (tmp_edge != NULL) {
+		if(tmp_edge->type == BACK) {
+			back_edge = tmp_edge;
+			 tmp_edge = tmp_edge->next_member;
+
+			 graph_del_edge (src, back_edge->prev_node->str,
+					      back_edge->next_node->str,
+					      back_edge->prev_node->size,
+					      back_edge->next_node->size);
+		}
+
+		else {
+			tmp_edge = tmp_edge->next_member;
+		}
+	}
+
 
 	return result;
 
@@ -566,13 +654,14 @@ int DFS (graph_st* src, node_st* tmp_node, node_st* finish_node, int C_min, node
 
 	// find path with low capacity
 	edge_st* tmp_edge = tmp_node->output_edges.first_member;
+
 	while (tmp_edge != NULL) {
 		if(tmp_edge->next_node->visit == NOT_VISITED &&
 	           tmp_edge->flow < tmp_edge->weight           ) {
 			delta = DFS (src, tmp_edge->next_node, finish_node,
 				       	 min(C_min, tmp_edge->weight - tmp_edge->flow), local_path, &local_i);
 
-			if(delta_min == 0 || delta_min > delta) {
+			if((delta_min == 0 || delta_min > delta) && delta > 0) {
 				delta_min = delta;
 
 				min_node = tmp_edge->next_node;
@@ -585,7 +674,7 @@ int DFS (graph_st* src, node_st* tmp_node, node_st* finish_node, int C_min, node
 
 		tmp_edge = tmp_edge->next_member;
 	}
-	
+	 
 	tmp_node->value = delta_min;
 	
 	/*tmp_edge = tmp_node->output_edges.first_member;
